@@ -78,7 +78,6 @@ async function connectSerial() {
 }
 
 connectSerial();
-
 // var studentIds = "";
 
 // const url = "http://localhost:3000/api/students";
@@ -127,28 +126,24 @@ connectSerial();
 //     console.error(error.message);
 //   });
 
-var studentIds = "";
-let authToken = "RabpSNAsz6ysxdFjW3D_"; // Initial authentication token
+let authToken = localStorage.getItem("authToken");
 
 const url = "http://localhost:3000/api/students";
-const headers = {
-  Accept: "application/json",
-  Username: "aadmin",
-  Auth_Token: authToken,
-};
-
 const queryParams = new URLSearchParams({
   unit_id: 1,
   all: false,
 });
 
-const requestOptions = {
-  headers: headers,
-};
-
-const itemDropdown = document.getElementById("itemDropdown");
-
 function fetchStudentIds() {
+  const headers = {
+    Accept: "application/json",
+    Username: "aadmin",
+    Auth_Token: authToken,
+  };
+  const requestOptions = {
+    headers: headers,
+  };
+
   fetch(`${url}?${queryParams.toString()}`, requestOptions)
     .then((response) => {
       if (!response.ok) {
@@ -180,30 +175,29 @@ function fetchStudentIds() {
 // Function to refresh authentication token
 async function refreshAuthToken() {
   try {
-    const response = await fetch('http://localhost:3000/api/auth', {
-      method: 'POST',
+    const response = await fetch("http://localhost:3000/api/auth", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        username: 'aadmin',
-        password: 'your_password'
-      })
+        username: "aadmin",
+        password: "password",
+      }),
     });
     const responseData = await response.json();
     authToken = responseData.auth_token;
-    console.log('Authentication token refreshed:', authToken);
+    localStorage.setItem("authToken", authToken);
+    console.log("Authentication token refreshed:", authToken);
+    // After refreshing token, fetch student IDs
+    fetchStudentIds();
   } catch (error) {
-    console.error('Error refreshing authentication token:', error);
+    console.error("Error refreshing authentication token:", error);
   }
 }
 
-// Fetch student IDs initially
-fetchStudentIds();
-
-// Check for token expiration and refresh if necessary
-setInterval(refreshAuthToken, 60000); // Refresh token every minute
-
+// Call refreshAuthToken initially to get the token
+refreshAuthToken();
 
 $("#home").on("click", () => {
   location.href = "/";

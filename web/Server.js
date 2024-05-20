@@ -22,6 +22,10 @@ app.get("/unideck", (req, res) => {
   res.sendFile(`${base}/unideck.html`);
 });
 
+app.get("/room", (req, res) => {
+  res.sendFile(`${base}/room.html`);
+});
+
 app.listen(port, () => {
   console.log(`listening on port ${port}`);
 });
